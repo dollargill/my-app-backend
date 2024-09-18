@@ -4,10 +4,11 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
-const app = express();
-
 // Connect to MongoDB
 connectDB();
+
+// Initialize Express app
+const app = express();
 
 // Middleware
 app.use(express.json());
@@ -18,36 +19,33 @@ app.get('/', (req, res) => {
   res.send('API is running...');
 });
 
-// Start the server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const intexRoutes = require('./routes/intexRoutes');
+app.use('/api/intex', intexRoutes);
 
-// server.js
-app.use('/api/intex', require('./routes/intexRoutes'));
+app.use('/api/companies', require('./routes/companyRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/jobs', require('./routes/jobRoutes'));
 
-// server.js
-// ...
+
 const authRoutes = require('./routes/authRoutes');
-// ...
-
-// Use Routes
 app.use('/api/auth', authRoutes);
 
 const userRoutes = require('./routes/userRoutes');
-
-// Use Routes
 app.use('/api/users', userRoutes);
 
 const rewardRoutes = require('./routes/rewardRoutes');
-
-// Use Routes
 app.use('/api/rewards', rewardRoutes);
 
-app.use(express.json());
-
-const cors = require('cors');
-app.use(cors());
-
+// Error Handling Middleware
 const errorHandler = require('./middlewares/errorHandler');
-// ...
 app.use(errorHandler);
+
+// Start the server only if this script is run directly (not during tests)
+if (require.main === module) {
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+}
+
+// Export the app for testing
+module.exports = app;
+

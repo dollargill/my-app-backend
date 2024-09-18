@@ -1,12 +1,13 @@
-// models/User.js
+// models/Company.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const UserSchema = new mongoose.Schema(
+const CompanySchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
+      unique: true,
       trim: true,
     },
     email: {
@@ -20,10 +21,16 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    resume: {
+    description: {
       type: String,
     },
-    appliedJobs: [
+    website: {
+      type: String,
+    },
+    location: {
+      type: String,
+    },
+    jobs: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Job',
@@ -36,7 +43,7 @@ const UserSchema = new mongoose.Schema(
 );
 
 // Hash password before saving
-UserSchema.pre('save', async function (next) {
+CompanySchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
@@ -45,8 +52,8 @@ UserSchema.pre('save', async function (next) {
   next();
 });
 
-UserSchema.methods.matchPassword = async function (enteredPassword) {
+CompanySchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('Company', CompanySchema);
